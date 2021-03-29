@@ -1,5 +1,6 @@
-import { all, fork, put, takeLatest, call } from "redux-saga/effects";
-import axios from "axios";
+import { all, fork, put, call, CallEffect, PutEffect, ForkEffect } from "redux-saga/effects";
+import * as Eff from "redux-saga/effects";
+import axios, { AxiosResponse } from "axios";
 import {
   SIGNUP_REQUEST,
   SIGNUP_SUCCESS,
@@ -9,52 +10,88 @@ import {
   LOGIN_FAILURE,
 } from "@store/reducers/users";
 
-// function signUpAPI(data) {
-//   return axios.post("/users/signup", data);
-// }
+interface singUpData {
+  email: string;
+  paswword: string;
+  confirm_password: string;
+  nickname: string;
+}
 
-// function* signUp(action) {
-//   try {
-//     const result = yield call(signUpAPI, action.data);
-//     console.log(result);
-//     yield put({ type: SIGNUP_SUCCESS });
-//   } catch (err) {
-//     console.error(err);
-//     yield put({
-//       type: SIGNUP_FAILURE,
-//       error: err.response.data,
-//     });
-//   }
-// }
+interface logInData {
+  email: string;
+  password: string;
+}
 
-// function logInAPI(data) {
-//   return axios.post("/users/login", data);
-// }
+function signUpAPI(data: singUpData) {
+  return axios.post("/users/signup", data);
+}
 
-// function* logIn(action) {
-//   try {
-//     const result = yield call(logInAPI, action.data);
-//     yield put({
-//       type: LOGIN_SUCCESS,
-//       data: result.data,
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     yield put({
-//       type: LOGIN_FAILURE,
-//       error: err.response.data,
-//     });
-//   }
-// }
+function* signUp(action: {
+  data: singUpData;
+}): Generator<
+  | CallEffect<AxiosResponse<any>>
+  | PutEffect<{
+      type: string;
+    }>,
+  void,
+  unknown
+> {
+  try {
+    const result = yield call(signUpAPI, action.data);
+    console.log(result);
+    yield put({ type: SIGNUP_SUCCESS });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: SIGNUP_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
 
-// function* watchSignUp() {
-//   yield takeLatest(SIGNUP_REQUEST, signUp);
-// }
+function logInAPI(data: logInData) {
+  return axios.post("/users/login", data);
+}
 
-// function* watchLogIn() {
-//   yield takeLatest(LOGIN_REQUEST, logIn);
-// }
+function* logIn(action: {
+  data: logInData;
+}): Generator<
+  | CallEffect<AxiosResponse<any>>
+  | PutEffect<{
+      type: string;
+      data: any;
+    }>
+  | PutEffect<{
+      type: string;
+      error: any;
+    }>,
+  void,
+  unknown
+> {
+  try {
+    const result = yield call(logInAPI, action.data);
+    yield put({
+      type: LOGIN_SUCCESS,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOGIN_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+const takeLatest: any = Eff.takeLatest;
 
-// export default function* usersSaga() {
-//   yield all([fork(watchSignUp), fork(watchLogIn)]);
-// }
+function* watchSignUp() {
+  yield takeLatest(SIGNUP_REQUEST, signUp);
+}
+
+function* watchLogIn() {
+  yield takeLatest(LOGIN_REQUEST, logIn);
+}
+
+export default function* usersSaga() {
+  yield all([fork(watchSignUp), fork(watchLogIn)]);
+}

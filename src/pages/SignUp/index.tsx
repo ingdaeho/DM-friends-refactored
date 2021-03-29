@@ -109,7 +109,7 @@ const SignUp = () => {
     }
     dispatch({
       type: SIGNUP_REQUEST,
-      data: { email, password, nickname },
+      data: { email, password, confirm_password: password, nickname },
     });
   }, [email, password, nickname]);
 

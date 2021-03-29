@@ -1,4 +1,3 @@
-import { deflate } from "node:zlib";
 import { createStore, compose, applyMiddleware } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import createSagaMiddleware from "redux-saga";
