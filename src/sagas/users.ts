@@ -38,9 +38,9 @@ function* signUp(action: {
 > {
   try {
     const result = yield call(signUpAPI, action.data);
-    console.log(result);
     yield put({ type: SIGNUP_SUCCESS });
   } catch (err) {
+    console.log(err);
     console.error(err);
     yield put({
       type: SIGNUP_FAILURE,
@@ -70,6 +70,7 @@ function* logIn(action: {
 > {
   try {
     const result = yield call(logInAPI, action.data);
+    console.log(result);
     yield put({
       type: LOGIN_SUCCESS,
       data: result,

@@ -126,6 +126,8 @@ export const Button = styled.button`
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+  color: black;
+  background-color: ${(props) => (props.disabled ? "" : "#fbdd0d")};
 `;
 
 export const Footer = styled.footer`

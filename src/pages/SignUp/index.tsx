@@ -24,21 +24,23 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const { signupLoading, signupDone, signupError, me } = useSelector((state) => state.users);
 
-  useEffect(() => {
-    if (me && me.id) {
-      <Redirect to="/" />;
-    }
-  }, [me && me.id]);
+  // useEffect(() => {
+  //   if (me && me.id) {
+  //     <Redirect to="/" />;
+  //   }
+  //   console.log(me);
+  // }, [me && me.id]);
 
   useEffect(() => {
     if (signupDone) {
-      <Redirect to="/" />;
+      alert("가입 완료");
+      setRedirectTo(true);
     }
   }, [signupDone]);
 
   useEffect(() => {
-    if (signupError) {
-      alert(signupError);
+    if (signupError?.message === "duplicated") {
+      alert("아이디가 중복됩니다");
     }
   }, [signupError]);
 
@@ -47,25 +49,29 @@ const SignUp = () => {
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
 
-  const [mismatchError, setMissmatchError] = useState(false);
   const [terms, setTerms] = useState<terms[]>([]);
+  const [passwordError, setPasswordError] = useState(false);
+  const [formComplete, setFormComplete] = useState(false);
+  const [redirectTo, setRedirectTo] = useState(false);
+
   const checkedAll = terms.reduce((result, el) => (result = result && el.checked), true);
 
   useEffect(() => {
-    axios
-      .get("/data/signup.json")
-      .then((res) => {
-        setTerms(res.data.policies);
-      })
-      .catch((error) => {
-        console.log(error.response);
-      });
+    setTerms(TERMS);
   }, []);
+
+  useEffect(() => {
+    if (email && !passwordError && nickname && checkedAll) {
+      setFormComplete(true);
+    } else {
+      setFormComplete(false);
+    }
+  }, [email, passwordError, nickname, terms]);
 
   const onChangePassword = useCallback(
     (e) => {
       setPassword(e.target.value);
-      setMissmatchError(e.target.value !== passwordCheck);
+      setPasswordError(e.target.value !== passwordCheck);
     },
     [passwordCheck],
   );
@@ -73,7 +79,7 @@ const SignUp = () => {
   const onChangePasswordCheck = useCallback(
     (e) => {
       setPasswordCheck(e.target.value);
-      setMissmatchError(e.target.value !== password);
+      setPasswordError(e.target.value !== password);
     },
     [password],
   );
@@ -103,16 +109,20 @@ const SignUp = () => {
     [terms],
   );
 
-  const onSubmit = useCallback(() => {
-    if (mismatchError) {
-      return;
-    }
-    dispatch({
-      type: SIGNUP_REQUEST,
-      data: { email, password, confirm_password: password, nickname },
-    });
-  }, [email, password, nickname]);
+  const onSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      dispatch({
+        type: SIGNUP_REQUEST,
+        data: { email, password, confirm_password: password, username: nickname },
+      });
+    },
+    [email, password, nickname],
+  );
 
+  if (redirectTo) {
+    return <Redirect to="/login" />;
+  }
   return (
     <Signup>
       <Title>동묘앞프렌즈</Title>
@@ -141,7 +151,7 @@ const SignUp = () => {
             onChange={onChangePasswordCheck}
             style={{ marginBottom: 10 }}
           />
-          {mismatchError && <Error>비밀번호가 같지 않습니다.</Error>}
+          {passwordError && <Error>비밀번호가 같지 않습니다.</Error>}
         </Label>
         <Label style={{ marginTop: 30 }}>
           <span>닉네임</span>
@@ -177,7 +187,7 @@ const SignUp = () => {
             );
           })}
         </TermContainer>
-        <Button>다음</Button>
+        <Button disabled={!formComplete}>회원가입</Button>
       </Form>
       <Footer>
         <span>
@@ -194,3 +204,26 @@ const SignUp = () => {
 };
 
 export default SignUp;
+
+const TERMS = [
+  {
+    id: 0,
+    title: "만 14세 이상입니다.(필수)",
+    checked: false,
+  },
+  {
+    id: 1,
+    title: "이용약관(필수)",
+    checked: false,
+  },
+  {
+    id: 2,
+    title: "개인정보처리방침(필수)",
+    checked: false,
+  },
+  {
+    id: 3,
+    title: "이벤트, 프로모션 알림 메일 및 SMS 수신",
+    checked: false,
+  },
+];
