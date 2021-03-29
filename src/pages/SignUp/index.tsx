@@ -88,7 +88,7 @@ const SignUp = () => {
           el.checked = true;
           return el;
         });
-    setTerms(terms);
+    setTerms([...terms]);
   }, [terms]);
 
   const handleCheckedBox = useCallback(
@@ -98,8 +98,7 @@ const SignUp = () => {
           el.checked = !el.checked;
         }
       }
-      setTerms(terms);
-      console.log(terms);
+      setTerms([...terms]);
     },
     [terms],
   );
@@ -114,7 +113,6 @@ const SignUp = () => {
     });
   }, [email, password, nickname]);
 
-  console.log(terms);
   return (
     <Signup>
       <Title>동묘앞프렌즈</Title>
