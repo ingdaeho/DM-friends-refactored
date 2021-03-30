@@ -1,6 +1,6 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import useInput from "@hooks/useInput";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import {
   Login,
   Section,
@@ -22,15 +22,24 @@ import { loginRequestAction } from "@store/reducers/users";
 
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loginLoading, loginError } = useSelector((state) => state.users);
+  const { loginDone, loginError } = useSelector((state) => state.users);
   const [email, setEmail, onChangeEmail] = useInput("");
   const [password, setPassword, onChangePassword] = useInput("");
+  const [redirectTo, setRedirectTo] = useState(false);
 
   useEffect(() => {
     if (loginError) {
-      alert(loginError.message);
+      if (loginError?.message === "Bad Requests") {
+        alert("비밀번호를 확인해주세요");
+      } else {
+        alert(loginError.message);
+      }
     }
-  }, [loginError]);
+    if (loginDone) {
+      alert("로그인 성공");
+      setRedirectTo(true);
+    }
+  }, [loginError, loginDone]);
 
   const onSubmit = useCallback(
     (e) => {
@@ -39,26 +48,10 @@ const LogIn = () => {
     },
     [email, password],
   );
-  // const loginCheck = (e) => {
-  //   e.preventDefault();
-  //   fetch(`${API}/user/login`, {
-  //     method: "POST",
-  //     body: JSON.stringify({
-  //       email: this.state.email,
-  //       password: this.state.pw,
-  //     }),
-  //   })
-  //     .then((response) => response.json())
-  //     .then((result) => {
-  //       if (result.message === "SUCCESS_LOGIN") {
-  //         alert("로그인 성공!");
-  //         this.props.history.push("/");
-  //       } else {
-  //         alert("회원정보를 찾을 수 없습니다.");
-  //         this.props.history.push("/Signup");
-  //       }
-  //     });
-  // };
+
+  if (redirectTo) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <Login>

@@ -1,4 +1,4 @@
-import { all, fork, put, call, CallEffect, PutEffect, ForkEffect } from "redux-saga/effects";
+import { all, fork, put, call, CallEffect, PutEffect } from "redux-saga/effects";
 import * as Eff from "redux-saga/effects";
 import axios, { AxiosResponse } from "axios";
 import {
@@ -9,18 +9,7 @@ import {
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
 } from "@store/reducers/users";
-
-interface singUpData {
-  email: string;
-  paswword: string;
-  confirm_password: string;
-  nickname: string;
-}
-
-interface logInData {
-  email: string;
-  password: string;
-}
+import { singUpData, logInData } from "@typings/db";
 
 function signUpAPI(data: singUpData) {
   return axios.post("/users/signup", data);
@@ -40,7 +29,6 @@ function* signUp(action: {
     const result = yield call(signUpAPI, action.data);
     yield put({ type: SIGNUP_SUCCESS });
   } catch (err) {
-    console.log(err);
     console.error(err);
     yield put({
       type: SIGNUP_FAILURE,
@@ -53,27 +41,34 @@ function logInAPI(data: logInData) {
   return axios.post("/users/login", data);
 }
 
+function* storeToken(response: any): Generator<void, void, unknown> {
+  try {
+    let token = response.data.token;
+    yield sessionStorage.setItem("token", token);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function* logIn(action: {
   data: logInData;
 }): Generator<
   | CallEffect<AxiosResponse<any>>
+  | CallEffect<Generator<void, void, unknown>>
   | PutEffect<{
       type: string;
       data: any;
     }>
-  | PutEffect<{
-      type: string;
-      error: any;
-    }>,
+  | PutEffect<{ type: string }>,
   void,
-  unknown
+  string
 > {
   try {
-    const result = yield call(logInAPI, action.data);
-    console.log(result);
+    const response = yield call(logInAPI, action.data);
+    yield call<(token: string) => Generator<void, void, unknown>>(storeToken, response);
     yield put({
       type: LOGIN_SUCCESS,
-      data: result,
+      data: response,
     });
   } catch (err) {
     console.error(err);

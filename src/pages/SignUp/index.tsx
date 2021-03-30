@@ -22,14 +22,13 @@ import { terms } from "@typings/db";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  const { signupLoading, signupDone, signupError, me } = useSelector((state) => state.users);
+  const { signupDone, signupError, me } = useSelector((state) => state.users);
 
-  // useEffect(() => {
-  //   if (me && me.id) {
-  //     <Redirect to="/" />;
-  //   }
-  //   console.log(me);
-  // }, [me && me.id]);
+  useEffect(() => {
+    if (me && me.id) {
+      setRedirectTo(true);
+    }
+  }, [me && me.id]);
 
   useEffect(() => {
     if (signupDone) {
