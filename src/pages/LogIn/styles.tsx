@@ -122,7 +122,7 @@ export const CheckBox = styled.div`
   }
 
   input[type="checkbox"]:checked + label span {
-    width: 6px;
+    width: 16px;
     height: 6px;
     border-radius: 100%;
     background: white;
@@ -137,6 +137,11 @@ export const LoginButton = styled.button`
   border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
+
+  :disabled {
+    color: inherit;
+    background-color: #efefef;
+  }
 `;
 
 export const Line = styled.div`

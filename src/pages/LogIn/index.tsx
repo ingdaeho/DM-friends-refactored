@@ -18,14 +18,16 @@ import {
   Info,
 } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { loginRequestAction, USER_INFO_REQUEST } from "@store/reducers/users";
+import { loginRequestAction, userInfoRequstAction } from "@store/reducers/users";
 
 const LogIn = () => {
   const dispatch = useDispatch();
   const { loginDone, loginError, userData } = useSelector((state) => state.users);
 
   useEffect(() => {
-    dispatch({ type: USER_INFO_REQUEST });
+    if (sessionStorage.getItem("token")) {
+      dispatch(userInfoRequstAction());
+    }
   }, []);
 
   const [email, setEmail, onChangeEmail] = useInput("");
@@ -88,7 +90,7 @@ const LogIn = () => {
               <div>또는</div>
               <div></div>
             </Line>
-            <LoginButton>QR코드 로그인</LoginButton>
+            <LoginButton disabled>QR코드 로그인</LoginButton>
           </Form>
           <SignIn>
             <Link to="Signup">회원가입</Link>

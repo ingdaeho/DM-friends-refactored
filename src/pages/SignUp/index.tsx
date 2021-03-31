@@ -14,7 +14,7 @@ import {
   Footer,
   Error,
 } from "./styles";
-import { SIGNUP_REQUEST, USER_INFO_REQUEST } from "@store/reducers/users";
+import { SIGNUP_REQUEST, userInfoRequstAction } from "@store/reducers/users";
 import Term from "@pages/SignUp/Term";
 import useInput from "@hooks/useInput";
 import { terms } from "@typings/db";
@@ -24,7 +24,9 @@ const SignUp = () => {
   const { signupDone, signupError, userData } = useSelector((state) => state.users);
 
   useEffect(() => {
-    dispatch({ type: USER_INFO_REQUEST });
+    if (sessionStorage.getItem("token")) {
+      dispatch(userInfoRequstAction());
+    }
   }, []);
 
   const [email, setEmail, onChangeEmail] = useInput("");

@@ -11,6 +11,9 @@ import {
   USER_INFO_REQUEST,
   USER_INFO_SUCCESS,
   USER_INFO_FAILURE,
+  LOGOUT_REQUEST,
+  LOGOUT_SUCCESS,
+  LOGOUT_FAILURE,
 } from "@store/reducers/users";
 import { singUpData, logInData } from "@typings/db";
 
@@ -81,6 +84,21 @@ function* logIn(action: {
   }
 }
 
+function* logOut() {
+  try {
+    yield sessionStorage.removeItem("token");
+    yield put({
+      type: LOGOUT_SUCCESS,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOGOUT_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function userInfoAPI(): Promise<AxiosResponse<any>> {
   const token = sessionStorage.getItem("token");
   return axios.get("/users", {
@@ -128,10 +146,14 @@ function* watchLogIn() {
   yield takeLatest(LOGIN_REQUEST, logIn);
 }
 
+function* watchLogOut() {
+  yield takeLatest(LOGOUT_REQUEST, logOut);
+}
+
 function* watchUserInfo() {
   yield takeLatest(USER_INFO_REQUEST, userInfo);
 }
 
 export default function* usersSaga() {
-  yield all([fork(watchSignUp), fork(watchLogIn), fork(watchUserInfo)]);
+  yield all([fork(watchSignUp), fork(watchLogIn), fork(watchUserInfo), fork(watchLogOut)]);
 }

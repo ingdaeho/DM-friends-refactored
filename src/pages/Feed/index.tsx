@@ -1,18 +1,29 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { USER_INFO_REQUEST } from "@store/reducers/users";
+import { userInfoRequstAction, logouRequestAction } from "@store/reducers/users";
+import { Redirect } from "react-router";
+
 const Feed = () => {
   const dispatch = useDispatch();
   const { userData } = useSelector((state) => state.users);
 
   useEffect(() => {
-    dispatch({ type: USER_INFO_REQUEST });
+    if (sessionStorage.getItem("token")) {
+      dispatch(userInfoRequstAction());
+    }
   }, []);
 
-  console.log(userData);
+  const LogOut = useCallback(() => {
+    dispatch(logouRequestAction());
+  }, []);
+
+  if (!userData) {
+    return <Redirect to="login" />;
+  }
+
   return (
     <div>
-      <button>로그아웃</button>
+      <button onClick={LogOut}>로그아웃</button>
     </div>
   );
 };
