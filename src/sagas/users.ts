@@ -8,6 +8,9 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
+  USER_INFO_REQUEST,
+  USER_INFO_SUCCESS,
+  USER_INFO_FAILURE,
 } from "@store/reducers/users";
 import { singUpData, logInData } from "@typings/db";
 
@@ -43,8 +46,7 @@ function logInAPI(data: logInData) {
 
 function* storeToken(response: any): Generator<void, void, unknown> {
   try {
-    let token = response.data.token;
-    yield sessionStorage.setItem("token", token);
+    yield sessionStorage.setItem("token", response.data.token);
   } catch (error) {
     console.log(error);
   }
@@ -78,6 +80,44 @@ function* logIn(action: {
     });
   }
 }
+
+function userInfoAPI(): Promise<AxiosResponse<any>> {
+  const token = sessionStorage.getItem("token");
+  return axios.get("/users", {
+    headers: {
+      authorization: `${token}`,
+    },
+  });
+}
+
+function* userInfo(): Generator<
+  | CallEffect<AxiosResponse<any>>
+  | PutEffect<{
+      type: string;
+      data: any;
+    }>
+  | PutEffect<{
+      type: string;
+      error: any;
+    }>,
+  void,
+  unknown
+> {
+  try {
+    const result = yield call(userInfoAPI);
+    yield put({
+      type: USER_INFO_SUCCESS,
+      data: result,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: USER_INFO_FAILURE,
+      error: err.result.data,
+    });
+  }
+}
+
 const takeLatest: any = Eff.takeLatest;
 
 function* watchSignUp() {
@@ -88,6 +128,10 @@ function* watchLogIn() {
   yield takeLatest(LOGIN_REQUEST, logIn);
 }
 
+function* watchUserInfo() {
+  yield takeLatest(USER_INFO_REQUEST, userInfo);
+}
+
 export default function* usersSaga() {
-  yield all([fork(watchSignUp), fork(watchLogIn)]);
+  yield all([fork(watchSignUp), fork(watchLogIn), fork(watchUserInfo)]);
 }

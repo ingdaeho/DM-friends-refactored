@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
-import axios from "axios";
 import {
   Signup,
   Title,
@@ -15,33 +14,18 @@ import {
   Footer,
   Error,
 } from "./styles";
-import { SIGNUP_REQUEST } from "@store/reducers/users";
+import { SIGNUP_REQUEST, USER_INFO_REQUEST } from "@store/reducers/users";
 import Term from "@pages/SignUp/Term";
 import useInput from "@hooks/useInput";
 import { terms } from "@typings/db";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  const { signupDone, signupError, me } = useSelector((state) => state.users);
+  const { signupDone, signupError, userData } = useSelector((state) => state.users);
 
   useEffect(() => {
-    if (me && me.id) {
-      setRedirectTo(true);
-    }
-  }, [me && me.id]);
-
-  useEffect(() => {
-    if (signupDone) {
-      alert("가입 완료");
-      setRedirectTo(true);
-    }
-  }, [signupDone]);
-
-  useEffect(() => {
-    if (signupError?.message === "duplicated") {
-      alert("아이디가 중복됩니다");
-    }
-  }, [signupError]);
+    dispatch({ type: USER_INFO_REQUEST });
+  }, []);
 
   const [email, setEmail, onChangeEmail] = useInput("");
   const [nickname, setNickname, onChangeNickname] = useInput("");
@@ -54,6 +38,19 @@ const SignUp = () => {
   const [redirectTo, setRedirectTo] = useState(false);
 
   const checkedAll = terms.reduce((result, el) => (result = result && el.checked), true);
+
+  useEffect(() => {
+    if (signupDone) {
+      alert("가입 완료");
+      setRedirectTo(true);
+    }
+    if (signupError?.message === "duplicated") {
+      alert("아이디가 중복됩니다");
+    }
+    if (userData && userData.data.userInfo) {
+      setRedirectTo(true);
+    }
+  }, [signupDone, signupError, userData]);
 
   useEffect(() => {
     setTerms(TERMS);
@@ -122,6 +119,7 @@ const SignUp = () => {
   if (redirectTo) {
     return <Redirect to="/login" />;
   }
+
   return (
     <Signup>
       <Title>동묘앞프렌즈</Title>

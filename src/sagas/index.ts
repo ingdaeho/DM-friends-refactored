@@ -4,7 +4,6 @@ import userSaga from "@sagas/users";
 
 axios.defaults.baseURL = process.env.REACT_APP_DEV_URL;
 // axios.defaults.withCredentials = true;
-// axios.defaults.headers.common["Autorization"] =
 
 export default function* rootSaga() {
   yield all([fork(userSaga)]);

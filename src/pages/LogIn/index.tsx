@@ -18,11 +18,16 @@ import {
   Info,
 } from "./styles";
 import { useDispatch, useSelector } from "react-redux";
-import { loginRequestAction } from "@store/reducers/users";
+import { loginRequestAction, USER_INFO_REQUEST } from "@store/reducers/users";
 
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loginDone, loginError } = useSelector((state) => state.users);
+  const { loginDone, loginError, userData } = useSelector((state) => state.users);
+
+  useEffect(() => {
+    dispatch({ type: USER_INFO_REQUEST });
+  }, []);
+
   const [email, setEmail, onChangeEmail] = useInput("");
   const [password, setPassword, onChangePassword] = useInput("");
   const [redirectTo, setRedirectTo] = useState(false);
@@ -39,7 +44,10 @@ const LogIn = () => {
       alert("로그인 성공");
       setRedirectTo(true);
     }
-  }, [loginError, loginDone]);
+    if (userData && userData.data.userInfo) {
+      setRedirectTo(true);
+    }
+  }, [loginError, loginDone, userData]);
 
   const onSubmit = useCallback(
     (e) => {
