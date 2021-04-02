@@ -1,29 +1,30 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userInfoRequstAction, logouRequestAction } from "@store/reducers/users";
-import { Redirect } from "react-router";
+import { logoutRequestAction } from "@store/reducers/users";
+import useSWR from "swr";
+import fetcher from "@utils/fetcher";
+import { useHistory } from "react-router";
 
 const Feed = () => {
   const dispatch = useDispatch();
-  const { userData } = useSelector((state) => state.users);
+  const history = useHistory();
 
-  useEffect(() => {
-    if (sessionStorage.getItem("token")) {
-      dispatch(userInfoRequstAction());
+  const shouldFetch = sessionStorage.getItem("token");
+  const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
+
+  const LogInOrOut = useCallback(() => {
+    if (userData) {
+      dispatch(logoutRequestAction());
+      history.push("/");
+    } else {
+      history.push("/login");
     }
-  }, []);
-
-  const LogOut = useCallback(() => {
-    dispatch(logouRequestAction());
-  }, []);
-
-  if (!userData) {
-    return <Redirect to="login" />;
-  }
+  }, [userData]);
 
   return (
     <div>
-      <button onClick={LogOut}>로그아웃</button>
+      <div>{userData?.userInfo.username}</div>
+      <button onClick={LogInOrOut}>{userData ? "로그아웃" : "로그인"}</button>
     </div>
   );
 };

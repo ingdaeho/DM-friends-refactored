@@ -7,7 +7,8 @@
       "@sagas/*": ["src/sagas/*"],
       "@store/*": ["src/store/*"],
       "@hooks/*": ["src/hooks/*"],
-      "@typings/*": ["src/typings/*"]
+      "@typings/*": ["src/typings/*"],
+      "@utils/*": ["src/utils/*"]
     }
   }
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import useSWR from "swr";
 import {
   Signup,
   Title,
@@ -14,20 +15,18 @@ import {
   Footer,
   Error,
 } from "./styles";
-import { SIGNUP_REQUEST, userInfoRequstAction } from "@store/reducers/users";
+import { SIGNUP_REQUEST } from "@store/reducers/users";
 import Term from "@pages/SignUp/Term";
 import useInput from "@hooks/useInput";
 import { terms } from "@typings/db";
+import fetcher from "@utils/fetcher";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  const { signupDone, signupError, userData } = useSelector((state) => state.users);
+  const { signupDone, signupError } = useSelector((state) => state.users);
 
-  useEffect(() => {
-    if (sessionStorage.getItem("token")) {
-      dispatch(userInfoRequstAction());
-    }
-  }, []);
+  const shouldFetch = sessionStorage.getItem("token");
+  const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
 
   const [email, setEmail, onChangeEmail] = useInput("");
   const [nickname, setNickname, onChangeNickname] = useInput("");
@@ -49,10 +48,7 @@ const SignUp = () => {
     if (signupError?.message === "duplicated") {
       alert("아이디가 중복됩니다");
     }
-    if (userData && userData.data.userInfo) {
-      setRedirectTo(true);
-    }
-  }, [signupDone, signupError, userData]);
+  }, [signupDone, signupError]);
 
   useEffect(() => {
     setTerms(TERMS);
@@ -118,7 +114,7 @@ const SignUp = () => {
     [email, password, nickname],
   );
 
-  if (redirectTo) {
+  if (redirectTo || userData) {
     return <Redirect to="/login" />;
   }
 

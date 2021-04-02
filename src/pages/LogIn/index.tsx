@@ -1,6 +1,8 @@
 import { useEffect, useCallback, useState } from "react";
-import useInput from "@hooks/useInput";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, Redirect } from "react-router-dom";
+import useSWR from "swr";
+import useInput from "@hooks/useInput";
 import {
   Login,
   Section,
@@ -17,18 +19,15 @@ import {
   Links,
   Info,
 } from "./styles";
-import { useDispatch, useSelector } from "react-redux";
-import { loginRequestAction, userInfoRequstAction } from "@store/reducers/users";
+import { loginRequestAction } from "@store/reducers/users";
+import fetcher from "@utils/fetcher";
 
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loginDone, loginError, userData } = useSelector((state) => state.users);
+  const { loginDone, loginError } = useSelector((state) => state.users);
 
-  useEffect(() => {
-    if (sessionStorage.getItem("token")) {
-      dispatch(userInfoRequstAction());
-    }
-  }, []);
+  const shouldFetch = sessionStorage.getItem("token");
+  const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
 
   const [email, setEmail, onChangeEmail] = useInput("");
   const [password, setPassword, onChangePassword] = useInput("");
@@ -46,10 +45,7 @@ const LogIn = () => {
       alert("로그인 성공");
       setRedirectTo(true);
     }
-    if (userData && userData.data.userInfo) {
-      setRedirectTo(true);
-    }
-  }, [loginError, loginDone, userData]);
+  }, [loginError, loginDone]);
 
   const onSubmit = useCallback(
     (e) => {
@@ -59,8 +55,8 @@ const LogIn = () => {
     [email, password],
   );
 
-  if (redirectTo) {
-    return <Redirect to="/" />;
+  if (redirectTo || userData) {
+    return <Redirect push to="/" />;
   }
 
   return (

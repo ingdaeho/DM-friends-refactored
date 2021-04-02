@@ -8,9 +8,6 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGIN_FAILURE,
-  USER_INFO_REQUEST,
-  USER_INFO_SUCCESS,
-  USER_INFO_FAILURE,
   LOGOUT_REQUEST,
   LOGOUT_SUCCESS,
   LOGOUT_FAILURE,
@@ -33,7 +30,7 @@ function* signUp(action: {
 > {
   try {
     const result = yield call(signUpAPI, action.data);
-    yield put({ type: SIGNUP_SUCCESS });
+    yield put({ type: SIGNUP_SUCCESS, data: result });
   } catch (err) {
     console.error(err);
     yield put({
@@ -99,43 +96,6 @@ function* logOut() {
   }
 }
 
-function userInfoAPI(): Promise<AxiosResponse<any>> {
-  const token = sessionStorage.getItem("token");
-  return axios.get("/users", {
-    headers: {
-      authorization: `${token}`,
-    },
-  });
-}
-
-function* userInfo(): Generator<
-  | CallEffect<AxiosResponse<any>>
-  | PutEffect<{
-      type: string;
-      data: any;
-    }>
-  | PutEffect<{
-      type: string;
-      error: any;
-    }>,
-  void,
-  unknown
-> {
-  try {
-    const result = yield call(userInfoAPI);
-    yield put({
-      type: USER_INFO_SUCCESS,
-      data: result,
-    });
-  } catch (err) {
-    console.error(err);
-    yield put({
-      type: USER_INFO_FAILURE,
-      error: err.result.data,
-    });
-  }
-}
-
 const takeLatest: any = Eff.takeLatest;
 
 function* watchSignUp() {
@@ -150,10 +110,6 @@ function* watchLogOut() {
   yield takeLatest(LOGOUT_REQUEST, logOut);
 }
 
-function* watchUserInfo() {
-  yield takeLatest(USER_INFO_REQUEST, userInfo);
-}
-
 export default function* usersSaga() {
-  yield all([fork(watchSignUp), fork(watchLogIn), fork(watchUserInfo), fork(watchLogOut)]);
+  yield all([fork(watchSignUp), fork(watchLogIn), fork(watchLogOut)]);
 }

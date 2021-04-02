@@ -6,7 +6,7 @@ import store from "@store/store";
 import GlobalStyles from "@styles/GlobalStyles";
 
 render(
-  <BrowserRouter>
+  <BrowserRouter forceRefresh={true}>
     <Provider store={store}>
       <GlobalStyles />
       <App />
