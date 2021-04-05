@@ -11,7 +11,7 @@ const App = () => {
     <Switch>
       <Route path="/signup" component={SignUp} />
       <Route path="/login" component={LogIn} />
-      <Route path="/:userId/cart" component={Cart} />
+      <Route path="/users/:userId/cart" component={Cart} />
       <Route path="/" component={Feed} />
     </Switch>
   );

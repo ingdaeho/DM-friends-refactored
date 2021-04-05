@@ -68,7 +68,7 @@ const Feed = () => {
         return (
           <Feeds key={idx}>
             <Header>
-              <CharacterImage src={feed.feed_images.image_url} />
+              <CharacterImage src={feed.feed_images?.image_url} />
               <CharacterName>
                 {feed.characters?.name}
                 <p>{feed.created_at?.substring(0, 10)}</p>
@@ -92,7 +92,7 @@ const Feed = () => {
               </Content>
               <CommentWrapper>
                 <div>댓글 {feed.feed_comments ? feed.feed_comments.length : 0}개</div>
-                <span>{feed.feed_comments?.[0]?.users.username}</span> <span>{feed.feed_comments[0]?.contents}</span>
+                <span>{feed.feed_comments?.[0]?.users.username}</span> <span>{feed.feed_comments?.[0]?.contents}</span>
               </CommentWrapper>
             </BottomSection>
           </Feeds>
