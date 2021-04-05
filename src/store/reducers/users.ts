@@ -32,6 +32,7 @@ export const loginRequestAction = (data: { email: string; password: string }) =>
 export const logoutRequestAction = () => ({
   type: LOGOUT_REQUEST,
 });
+
 const reducer = (state = INITIAL_STATE, action: { type: any; error: null; data: null }) =>
   produce(state, (draft) => {
     switch (action.type) {

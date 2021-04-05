@@ -36,3 +36,28 @@ export interface feeds {
   title: string;
   updated_at?: string;
 }
+
+export interface cart {
+  id: number;
+  price: number;
+  products: {
+    id: number;
+    name: string;
+    product_images: [
+      {
+        image_url: string;
+      },
+    ];
+  };
+  quantity: number;
+  selected: boolean;
+}
+
+export interface response {
+  config: object;
+  data: cart[];
+  headers: object;
+  request: object;
+  status: number;
+  statusText: string;
+}

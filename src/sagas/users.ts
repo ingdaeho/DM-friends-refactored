@@ -47,8 +47,8 @@ function logInAPI(data: logInData) {
 function* storeToken(response: any): Generator<void, void, unknown> {
   try {
     yield sessionStorage.setItem("token", response.data.token);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.error(err);
   }
 }
 

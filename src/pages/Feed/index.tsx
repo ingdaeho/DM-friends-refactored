@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { logoutRequestAction } from "@store/reducers/users";
 import useSWR, { useSWRInfinite } from "swr";
 import fetcher from "@utils/fetcher";
@@ -27,11 +27,11 @@ const Feed = () => {
 
   const shouldFetch = sessionStorage.getItem("token");
   const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
-  const { data: feedData, setSize } = useSWRInfinite((index) => `/feeds?limit=5&page=${index}`, fetcher);
+  const { data: feedData, size, setSize } = useSWRInfinite((index) => `/feeds?limit=5&page=${index}`, fetcher);
 
   const feeds = feedData ? feedData.flat() : [];
-  const isEmpty = feeds.length === 0;
-  const isReachingEnd = isEmpty || feeds[feeds.length - 1]?.length < LIMIT || false;
+  const isEmpty = feeds?.length === 0;
+  const isReachingEnd = isEmpty || feeds?.length < LIMIT * size;
 
   const onScroll = useCallback(() => {
     let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
@@ -40,7 +40,7 @@ const Feed = () => {
     let scrollBottom = scrollTop + clientHeight;
 
     if (scrollBottom === scrollHeight && !isReachingEnd) {
-      setSize((prevSize) => prevSize + 1);
+      setSize((prevIndex) => prevIndex + 1);
     }
   }, [setSize, isReachingEnd]);
 
@@ -98,6 +98,7 @@ const Feed = () => {
           </Feeds>
         );
       })}
+      {isReachingEnd ? "끝입니다" : null}
     </WholeContainer>
   );
 };
