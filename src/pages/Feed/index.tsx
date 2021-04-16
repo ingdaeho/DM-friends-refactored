@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { logoutRequestAction } from "@store/reducers/users";
+import { logoutRequest } from "@store/reducers/users";
 import useSWR, { useSWRInfinite } from "swr";
 import fetcher from "@utils/fetcher";
 import { useHistory } from "react-router";
@@ -51,12 +51,12 @@ const Feed = () => {
 
   const LogInOrOut = useCallback(() => {
     if (userData) {
-      dispatch(logoutRequestAction());
+      dispatch(logoutRequest(userData));
       history.push("/");
     } else {
       history.push("/login");
     }
-  }, [userData]);
+  }, [dispatch, history, userData]);
 
   return (
     <WholeContainer>

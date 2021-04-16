@@ -15,7 +15,7 @@ import {
   Footer,
   Error,
 } from "./styles";
-import { SIGNUP_REQUEST } from "@store/reducers/users";
+import { signupRequest } from "@store/reducers/users";
 import Term from "@pages/SignUp/Term";
 import useInput from "@hooks/useInput";
 import { terms } from "@typings/db";
@@ -60,7 +60,7 @@ const SignUp = () => {
     } else {
       setFormComplete(false);
     }
-  }, [email, passwordError, nickname, terms]);
+  }, [email, passwordError, nickname, terms, checkedAll]);
 
   const onChangePassword = useCallback(
     (e) => {
@@ -106,12 +106,9 @@ const SignUp = () => {
   const onSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      dispatch({
-        type: SIGNUP_REQUEST,
-        data: { email, password, confirm_password: password, username: nickname },
-      });
+      dispatch(signupRequest({ email, password, confirm_password: password, username: nickname }));
     },
-    [email, password, nickname],
+    [dispatch, email, password, nickname],
   );
 
   if (redirectTo || userData) {

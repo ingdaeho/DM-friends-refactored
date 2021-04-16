@@ -16,6 +16,12 @@ export interface logInData {
   password: string;
 }
 
+export interface UserResponse {
+  message: string;
+  token?: string;
+  email?: string;
+}
+
 export interface feeds {
   character_id: number;
   characters: { name: string };
@@ -60,4 +66,8 @@ export interface response {
   request: object;
   status: number;
   statusText: string;
+}
+
+export interface UserState {
+  [key: string]: boolean | null | string;
 }

@@ -1,4 +1,5 @@
 import { produce, setAutoFreeze } from "immer";
+import { createAction, createSlice } from "@reduxjs/toolkit";
 
 setAutoFreeze(false);
 
@@ -17,6 +18,10 @@ export const INITIAL_STATE = {
   changeQuantityError: null,
   cartData: null || [],
 };
+
+// export const getCartItemRequest = createAction<string>("GET_CART_ITEM_REQUEST");
+// export const getCartItemSuccess = createAction<string>("GET_CART_ITEM_SUCCESS");
+// export const getCartItemFailure = createAction<string>("GET_CART_ITEM_FAILURE");
 
 export const GET_CART_ITEM_REQUEST = "GET_CART_ITEM_REQUEST";
 export const GET_CART_ITEM_SUCCESS = "GET_CART_ITEM_SUCCESS";

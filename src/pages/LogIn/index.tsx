@@ -19,12 +19,12 @@ import {
   Links,
   Info,
 } from "./styles";
-import { loginRequestAction } from "@store/reducers/users";
 import fetcher from "@utils/fetcher";
+import { loginRequest } from "@store/reducers/users";
 
 const LogIn = () => {
   const dispatch = useDispatch();
-  const { loginDone, loginError } = useSelector((state) => state.users);
+  const { loginDone, loginError } = useSelector((state) => state.userSlice);
 
   const shouldFetch = sessionStorage.getItem("token");
   const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
@@ -50,9 +50,9 @@ const LogIn = () => {
   const onSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      dispatch(loginRequestAction({ email, password }));
+      dispatch(loginRequest({ email, password }));
     },
-    [email, password],
+    [dispatch, email, password],
   );
 
   if (redirectTo || userData) {

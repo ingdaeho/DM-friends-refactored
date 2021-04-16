@@ -42,7 +42,7 @@ const Cart = () => {
 
   useEffect(() => {
     dispatch({ type: GET_CART_ITEM_REQUEST, data: { user_id } });
-  }, []);
+  }, [dispatch, user_id]);
 
   useEffect(() => {
     if (cartData !== null) {
@@ -82,7 +82,7 @@ const Cart = () => {
       idArr.push({ product_id: findProductId[0].products.id });
       dispatch({ type: DELETE_ITEM_REQUEST, data: { product_id: idArr, user_id, cart_id: id } });
     },
-    [cartItems],
+    [cartItems, dispatch, user_id],
   );
 
   const deleteSelected = useCallback(() => {
@@ -94,7 +94,7 @@ const Cart = () => {
     }
     dispatch({ type: DELETE_SELECTED_ITEMS_REQUEST, data: { product_id: productIdArr, user_id } });
     dispatch({ type: GET_CART_ITEM_REQUEST, data: { user_id } });
-  }, [cartItems]);
+  }, [cartItems, dispatch, user_id]);
 
   const handleQuantity = (e: { target: { value: number } }, id: number) => {
     const { value } = e.target;

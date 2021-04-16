@@ -1,6 +1,7 @@
-import produce from "immer";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { UserState } from "@typings/db";
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: UserState = {
   signupLoading: false,
   signupDone: false,
   signupError: null,
@@ -12,63 +13,59 @@ export const INITIAL_STATE = {
   logoutError: null,
 };
 
-export const SIGNUP_REQUEST = "SIGNUP_REQUEST";
-export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
-export const SIGNUP_FAILURE = "SIGNUP_FAILURE";
-
-export const LOGIN_REQUEST = "LOGIN_REQUEST";
-export const LOGIN_SUCCESS = "LOGIN_SUCCESS";
-export const LOGIN_FAILURE = "LOGIN_FAILURE";
-
-export const LOGOUT_REQUEST = "LOGOUT_REQUEST";
-export const LOGOUT_SUCCESS = "LOGOUT_SUCCESS";
-export const LOGOUT_FAILURE = "LOGOUT_FAILURE";
-
-export const loginRequestAction = (data: { email: string; password: string }) => ({
-  type: LOGIN_REQUEST,
-  data,
+const userSlice = createSlice({
+  name: "users",
+  initialState: INITIAL_STATE,
+  reducers: {
+    signupRequest(state, action) {
+      state.signupLoading = true;
+      state.signupDone = false;
+    },
+    signupSuccess(state, action) {
+      state.signupLoading = false;
+      state.signupDone = true;
+    },
+    signupFailure(state, action) {
+      state.signupLoading = false;
+      state.signupError = action.payload;
+    },
+    loginRequest(state, action) {
+      state.loginLoading = true;
+      state.loginDone = false;
+    },
+    loginSuccess(state, action) {
+      state.loginLoading = false;
+      state.loginDone = true;
+    },
+    loginFailure(state, action) {
+      state.loginLoading = false;
+      state.loginError = action.payload;
+    },
+    logoutRequest(state, action) {
+      state.logoutLoading = true;
+      state.logoutDone = false;
+    },
+    logoutSuccess(state, action) {
+      state.logoutLoading = false;
+      state.logoutDone = true;
+    },
+    logoutFailure(state, action) {
+      state.logoutLoading = false;
+      state.logoutError = action.payload;
+    },
+  },
 });
 
-export const logoutRequestAction = () => ({
-  type: LOGOUT_REQUEST,
-});
+export const {
+  signupRequest,
+  signupSuccess,
+  signupFailure,
+  loginRequest,
+  loginSuccess,
+  loginFailure,
+  logoutRequest,
+  logoutSuccess,
+  logoutFailure,
+} = userSlice.actions;
 
-const reducer = (state = INITIAL_STATE, action: { type: any; error: null; data: null }) =>
-  produce(state, (draft) => {
-    switch (action.type) {
-      case SIGNUP_REQUEST:
-        draft.signupError = null;
-        draft.signupDone = false;
-        break;
-      case SIGNUP_SUCCESS:
-        draft.signupDone = true;
-        break;
-      case SIGNUP_FAILURE:
-        draft.signupError = action.error;
-        break;
-      case LOGIN_REQUEST:
-        draft.loginError = null;
-        draft.loginDone = false;
-        break;
-      case LOGIN_SUCCESS:
-        draft.loginDone = true;
-        break;
-      case LOGIN_FAILURE:
-        draft.loginError = action.error;
-        break;
-      case LOGOUT_REQUEST:
-        draft.logoutError = null;
-        draft.logoutDone = false;
-        break;
-      case LOGOUT_SUCCESS:
-        draft.logoutDone = true;
-        break;
-      case LOGOUT_FAILURE:
-        draft.logoutError = action.error;
-        break;
-      default:
-        break;
-    }
-  });
-
-export default reducer;
+export default userSlice.reducer;
