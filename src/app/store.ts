@@ -4,11 +4,12 @@ import { all } from "redux-saga/effects";
 import rootReducer from "@app/rootReducer";
 import { usersSaga } from "@features/users/userSlice";
 import { cartSaga } from "@features/cart/cartSlice";
+import { feedSaga } from "@features/feed/feedSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 
 function* rootSaga() {
-  yield all([usersSaga(), cartSaga()]);
+  yield all([usersSaga(), cartSaga(), feedSaga()]);
 }
 
 const createStore = () => {

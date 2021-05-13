@@ -18,3 +18,13 @@ export interface IFeeds {
   title: string;
   updated_at?: string;
 }
+
+export interface IFeedState {
+  feeds: IFeeds[];
+  isLoading: boolean;
+  error: Error | null;
+  query: {
+    limit: number;
+    offset: number;
+  };
+}

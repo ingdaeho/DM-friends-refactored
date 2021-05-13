@@ -1,56 +1,50 @@
-import { useCallback, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useCallback, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutRequest } from "@features/users/userSlice";
-import useSWR, { useSWRInfinite } from "swr";
-import fetcher from "@utils/fetcher";
 import { useHistory } from "react-router";
 import * as S from "./styles";
 import { IFeeds } from "./types";
-
-const LIMIT = 5;
+import { RootState } from "@app/rootReducer";
+import { addPage, getFeedsStart } from "./feedSlice";
+import useIntersectionObserver from "@hooks/useIntersection";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const history = useHistory();
+  const { feeds, isLoading, error } = useSelector((state: RootState) => state.feedSlice);
+  const isLoggedIn = sessionStorage.getItem("token");
 
-  const shouldFetch = sessionStorage.getItem("token");
-  const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
-  const { data: feedData, size, setSize } = useSWRInfinite((index) => `/feeds?limit=5&page=${index}`, fetcher);
-
-  const feeds = feedData ? feedData.flat() : [];
-  const isEmpty = feeds?.length === 0;
-  const isReachingEnd = isEmpty || feeds?.length < LIMIT * size;
-
-  const onScroll = useCallback(() => {
-    let scrollHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-    let scrollTop = Math.max(document.documentElement.scrollTop, document.body.scrollTop);
-    let clientHeight = document.documentElement.clientHeight;
-    let scrollBottom = scrollTop + clientHeight;
-
-    if (scrollBottom === scrollHeight && !isReachingEnd) {
-      setSize((prevIndex) => prevIndex + 1);
-    }
-  }, [setSize, isReachingEnd]);
+  console.log(feeds);
 
   useEffect(() => {
-    window.addEventListener("scroll", onScroll, true);
-    return () => window.removeEventListener("scroll", onScroll, true);
-  }, [onScroll]);
+    dispatch(getFeedsStart());
+  }, [dispatch]);
+
+  const ref = useRef<HTMLDivElement | null>(null);
+  const entry = useIntersectionObserver(ref, {});
+  const isVisible = !!entry?.isIntersecting && !isLoading;
+
+  useEffect(() => {
+    if (isVisible) {
+      dispatch(addPage());
+      dispatch(getFeedsStart());
+    }
+  }, [dispatch, isVisible]);
 
   const LogInOrOut = useCallback(() => {
-    if (userData) {
-      dispatch(logoutRequest(userData));
+    if (isLoggedIn) {
+      dispatch(logoutRequest(isLoggedIn));
       history.push("/");
     } else {
       history.push("/login");
     }
-  }, [dispatch, history, userData]);
+  }, [dispatch, history, isLoggedIn]);
 
   return (
     <S.WholeContainer>
       <S.Nav>
-        <div>{userData?.userInfo.username}</div>
-        <button onClick={LogInOrOut}>{userData ? "로그아웃" : "로그인"}</button>
+        <div></div>
+        <button onClick={LogInOrOut}>{isLoggedIn ? "로그아웃" : "로그인"}</button>
       </S.Nav>
       {feeds.map((feed: IFeeds, idx: number) => {
         return (
@@ -86,7 +80,9 @@ const Feed = () => {
           </S.Feeds>
         );
       })}
-      {isReachingEnd ? "끝입니다" : null}
+      {isLoading && <div>로딩중..</div>}
+      {error && <div>에러 발생</div>}
+      <div ref={ref} />
     </S.WholeContainer>
   );
 };
