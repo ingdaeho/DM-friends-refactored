@@ -1,23 +1,11 @@
 import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { logoutRequest } from "@store/reducers/users";
+import { logoutRequest } from "@features/users/userSlice";
 import useSWR, { useSWRInfinite } from "swr";
 import fetcher from "@utils/fetcher";
 import { useHistory } from "react-router";
-import {
-  WholeContainer,
-  Nav,
-  Feeds,
-  Header,
-  CharacterImage,
-  CharacterName,
-  FeedImage,
-  BottomSection,
-  ButtonWrapper,
-  Content,
-  CommentWrapper,
-} from "./styles";
-import { feeds } from "@typings/db";
+import * as S from "./styles";
+import { IFeeds } from "./types";
 
 const LIMIT = 5;
 
@@ -59,47 +47,47 @@ const Feed = () => {
   }, [dispatch, history, userData]);
 
   return (
-    <WholeContainer>
-      <Nav>
+    <S.WholeContainer>
+      <S.Nav>
         <div>{userData?.userInfo.username}</div>
         <button onClick={LogInOrOut}>{userData ? "로그아웃" : "로그인"}</button>
-      </Nav>
-      {feeds.map((feed: feeds, idx: number) => {
+      </S.Nav>
+      {feeds.map((feed: IFeeds, idx: number) => {
         return (
-          <Feeds key={idx}>
-            <Header>
-              <CharacterImage src={feed.feed_images?.image_url} />
-              <CharacterName>
+          <S.Feeds key={idx}>
+            <S.Header>
+              <S.CharacterImage src={feed.feed_images?.image_url} />
+              <S.CharacterName>
                 {feed.characters?.name}
                 <p>{feed.created_at?.substring(0, 10)}</p>
-              </CharacterName>
-            </Header>
-            <FeedImage>
+              </S.CharacterName>
+            </S.Header>
+            <S.FeedImage>
               <img src={feed.feed_images?.image_url} alt="feed_image" />
-            </FeedImage>
-            <BottomSection>
-              <ButtonWrapper>
+            </S.FeedImage>
+            <S.BottomSection>
+              <S.ButtonWrapper>
                 <div>
                   <button>{feed.isLiked ? "red" : null}좋아요 버튼</button>
                   <button>댓글 버튼</button>
                 </div>
                 <button>공유하기</button>
-              </ButtonWrapper>
+              </S.ButtonWrapper>
               <p>{feed.likes?.length} likes</p>
-              <Content>
+              <S.Content>
                 <h3>{feed.title}</h3>
                 <p>{feed.contents}</p>
-              </Content>
-              <CommentWrapper>
+              </S.Content>
+              <S.CommentWrapper>
                 <div>댓글 {feed.feed_comments ? feed.feed_comments.length : 0}개</div>
                 <span>{feed.feed_comments?.[0]?.users.username}</span> <span>{feed.feed_comments?.[0]?.contents}</span>
-              </CommentWrapper>
-            </BottomSection>
-          </Feeds>
+              </S.CommentWrapper>
+            </S.BottomSection>
+          </S.Feeds>
         );
       })}
       {isReachingEnd ? "끝입니다" : null}
-    </WholeContainer>
+    </S.WholeContainer>
   );
 };
 

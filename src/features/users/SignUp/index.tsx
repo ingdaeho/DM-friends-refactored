@@ -1,58 +1,43 @@
 import { useState, useEffect, useCallback } from "react";
 import { Redirect } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import useSWR from "swr";
-import {
-  Signup,
-  Title,
-  Form,
-  UpperSectionTitle,
-  Label,
-  Input,
-  TermTitle,
-  TermContainer,
-  Button,
-  Footer,
-  Error,
-} from "./styles";
-import { signupRequest } from "@store/reducers/users";
-import Term from "@pages/SignUp/Term";
+import * as S from "./styles";
+import { signupRequest } from "@features/users/userSlice";
+import Terms from "@features/users/SignUp/Term";
 import useInput from "@hooks/useInput";
-import { terms } from "@typings/db";
-import fetcher from "@utils/fetcher";
+import { RootState } from "@app/rootReducer";
+import { ITerms } from "@features/users/types";
 
 const SignUp = () => {
   const dispatch = useDispatch();
-  const { signupDone, signupError } = useSelector((state) => state.users);
-
-  const shouldFetch = sessionStorage.getItem("token");
-  const { data: userData } = useSWR(shouldFetch ? "/users" : null, fetcher);
+  const { isLoading, error, signupDone } = useSelector((state: RootState) => state.userSlice);
 
   const [email, setEmail, onChangeEmail] = useInput("");
   const [nickname, setNickname, onChangeNickname] = useInput("");
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
 
-  const [terms, setTerms] = useState<terms[]>([]);
+  const [terms, setTerms] = useState<ITerms[]>([]);
   const [passwordError, setPasswordError] = useState(false);
   const [formComplete, setFormComplete] = useState(false);
   const [redirectTo, setRedirectTo] = useState(false);
 
+  const isLoggedIn = sessionStorage.getItem("token");
   const checkedAll = terms.reduce((result, el) => (result = result && el.checked), true);
+
+  useEffect(() => {
+    setTerms(TERMS);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (signupDone) {
       alert("가입 완료");
       setRedirectTo(true);
     }
-    if (signupError?.message === "duplicated") {
+    if (error?.message === "Request failed with status code 409") {
       alert("아이디가 중복됩니다");
     }
-  }, [signupDone, signupError]);
-
-  useEffect(() => {
-    setTerms(TERMS);
-  }, []);
+  }, [error, signupDone]);
 
   useEffect(() => {
     if (email && !passwordError && nickname && checkedAll) {
@@ -111,23 +96,23 @@ const SignUp = () => {
     [dispatch, email, password, nickname],
   );
 
-  if (redirectTo || userData) {
+  if (redirectTo || isLoggedIn) {
     return <Redirect to="/login" />;
   }
 
   return (
-    <Signup>
-      <Title>동묘앞프렌즈</Title>
-      <Form onSubmit={onSubmit}>
-        <UpperSectionTitle>회원가입</UpperSectionTitle>
-        <Label>
+    <S.Signup>
+      <S.Title>동묘앞프렌즈</S.Title>
+      <S.Form onSubmit={onSubmit}>
+        <S.UpperSectionTitle>회원가입</S.UpperSectionTitle>
+        <S.Label>
           <span>이메일주소</span>
-          <Input id="email" type="email" placeholder="이메일 주소 입력" value={email} onChange={onChangeEmail} />
+          <S.Input id="email" type="email" placeholder="이메일 주소 입력" value={email} onChange={onChangeEmail} />
           <div></div>
-        </Label>
-        <Label style={{ marginTop: 20 }}>
+        </S.Label>
+        <S.Label style={{ marginTop: 20 }}>
           <span>비밀번호</span>
-          <Input
+          <S.Input
             id="password"
             type="password"
             placeholder="비밀번호(8~32자리)"
@@ -136,19 +121,19 @@ const SignUp = () => {
             onChange={onChangePassword}
             style={{ marginBottom: 10 }}
           />
-          <Input
+          <S.Input
             id="password-check"
             type="password"
             placeholder="비밀번호 재입력"
             onChange={onChangePasswordCheck}
             style={{ marginBottom: 10 }}
           />
-          {passwordError && <Error>비밀번호가 같지 않습니다.</Error>}
-        </Label>
-        <Label style={{ marginTop: 30 }}>
+          {passwordError && <S.Error>비밀번호가 같지 않습니다.</S.Error>}
+        </S.Label>
+        <S.Label style={{ marginTop: 30 }}>
           <span>닉네임</span>
           <span>{nickname.length}/20</span>
-          <Input
+          <S.Input
             id="nickname"
             type="text"
             placeholder="닉네임을 입력해주세요."
@@ -156,9 +141,9 @@ const SignUp = () => {
             value={nickname}
             onChange={onChangeNickname}
           />
-        </Label>
-        <TermTitle>약관 동의</TermTitle>
-        <TermContainer>
+        </S.Label>
+        <S.TermTitle>약관 동의</S.TermTitle>
+        <S.TermContainer>
           <li>
             <input type="checkbox" id="checkAllBoxes" checked={checkedAll} onChange={handleAllCheckedBoxes} />
             <label htmlFor="checkAllBoxes">
@@ -169,7 +154,7 @@ const SignUp = () => {
           <div className="formPolicyBar"></div>
           {terms.map((terms, index) => {
             return (
-              <Term
+              <Terms
                 key={index}
                 index={index}
                 title={terms.title}
@@ -178,10 +163,10 @@ const SignUp = () => {
               />
             );
           })}
-        </TermContainer>
-        <Button disabled={!formComplete}>회원가입</Button>
-      </Form>
-      <Footer>
+        </S.TermContainer>
+        <S.Button disabled={!formComplete}>회원가입</S.Button>
+      </S.Form>
+      <S.Footer>
         <span>
           이용약관&nbsp;&nbsp;&nbsp;개인정보&nbsp;&nbsp;&nbsp;처리방침&nbsp;&nbsp;&nbsp;운영정책&nbsp;&nbsp;&nbsp;고객센터&nbsp;&nbsp;&nbsp;공지사항&nbsp;&nbsp;&nbsp;한국어
         </span>
@@ -190,8 +175,8 @@ const SignUp = () => {
           <span className="dmFriends">DongMyo Friends.</span>
           <span>All rights reserved.</span>
         </div>
-      </Footer>
-    </Signup>
+      </S.Footer>
+    </S.Signup>
   );
 };
 

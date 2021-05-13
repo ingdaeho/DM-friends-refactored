@@ -1,15 +1,15 @@
-import { useEffect, useState, VFC } from "react";
-import { cart } from "@typings/db";
+import { useEffect, useState, FC } from "react";
+import { ICart } from "@features/cart/types";
 import { Item, ImageBox, ItemInfo, Price, Quantity } from "./styles";
 
 interface Props {
   index: number;
-  item: cart;
+  item: ICart;
   selectItem: (index: number) => void;
   deleteOneItem: (id: number) => void;
   handleQuantity: (e: any, index: number) => void;
 }
-const Product: VFC<Props> = ({ index, item, selectItem, deleteOneItem, handleQuantity }) => {
+const Product: FC<Props> = ({ index, item, selectItem, deleteOneItem, handleQuantity }) => {
   const [quantityRange, setQuantityRange] = useState<number[]>([]);
 
   useEffect(() => {

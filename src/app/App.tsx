@@ -1,10 +1,10 @@
 import loadable from "@loadable/component";
 import { Route, Switch } from "react-router-dom";
 
-const SignUp = loadable(() => import("@pages/SignUp"));
-const LogIn = loadable(() => import("@pages/LogIn"));
-const Feed = loadable(() => import("@pages/Feed"));
-const Cart = loadable(() => import("@pages/Cart"));
+const SignUp = loadable(() => import("@features/users/SignUp"));
+const LogIn = loadable(() => import("@features/users/LogIn"));
+const Feed = loadable(() => import("@features/feed"));
+const Cart = loadable(() => import("@features/cart"));
 
 const App = () => {
   return (

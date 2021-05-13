@@ -1,4 +1,4 @@
-import { VFC } from "react";
+import { FC } from "react";
 
 interface Props {
   index: number;
@@ -7,7 +7,7 @@ interface Props {
   handleCheckedBox: (e: any) => void;
 }
 
-const Term: VFC<Props> = ({ index, title, checkedTerms, handleCheckedBox }) => {
+const Term: FC<Props> = ({ index, title, checkedTerms, handleCheckedBox }) => {
   return (
     <li>
       <input type="checkbox" checked={checkedTerms} id={`title${index}`} onChange={() => handleCheckedBox(index)} />
