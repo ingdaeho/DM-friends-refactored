@@ -1,15 +1,16 @@
-import { useEffect, useState, FC } from "react";
+import { useEffect, useState, FC, memo } from "react";
 import { ICart } from "@features/cart/types";
 import { Item, ImageBox, ItemInfo, Price, Quantity } from "./styles";
+import Checkbox from "@components/Checkbox";
 
 interface Props {
   index: number;
   item: ICart;
   selectItem: (index: number) => void;
-  deleteOneItem: (id: number) => void;
+  handleDeleteItem: (id: number) => void;
   handleQuantity: (e: any, index: number) => void;
 }
-const Product: FC<Props> = ({ index, item, selectItem, deleteOneItem, handleQuantity }) => {
+const Product: FC<Props> = ({ index, item, selectItem, handleDeleteItem, handleQuantity }) => {
   const [quantityRange, setQuantityRange] = useState<number[]>([]);
 
   useEffect(() => {
@@ -26,17 +27,14 @@ const Product: FC<Props> = ({ index, item, selectItem, deleteOneItem, handleQuan
 
   return (
     <Item key={index}>
-      <input type="checkbox" id={`checkBox${item.id}`} checked={item.selected} onChange={() => selectItem(item.id)} />
-      <label htmlFor={`checkBox${item.id}`}>
-        <span />
-      </label>
+      <Checkbox id={item.id} checked={item.selected} onChange={() => selectItem(item.id)} />
       <ImageBox>
         <img src={item.products.product_images[0]?.image_url} alt="product_images" />
       </ImageBox>
       <ItemInfo>
         <div>
           {item.products.name}
-          <button className="deleteItem" onClick={() => deleteOneItem(item.id)}>
+          <button className="deleteItem" onClick={() => handleDeleteItem(item.id)}>
             <img alt="deleteBtn" />
           </button>
         </div>
@@ -54,4 +52,4 @@ const Product: FC<Props> = ({ index, item, selectItem, deleteOneItem, handleQuan
     </Item>
   );
 };
-export default Product;
+export default memo(Product);

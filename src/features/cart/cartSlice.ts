@@ -41,12 +41,12 @@ const cartSlice = createSlice({
       const target = state.cart.find((item) => item.id === action.payload.cart_id);
       if (target) target.quantity = action.payload.quantity;
     },
-    selectEachItem(state: ICartState, action: PayloadAction<number>) {
+    selectCartItem(state: ICartState, action: PayloadAction<number>) {
       state.cart = state.cart.map((item) =>
         item.id === action.payload ? { ...item, selected: !item.selected } : item,
       );
     },
-    selectAllItem(state: ICartState) {
+    selectAllCartItem(state: ICartState) {
       state.cart = state.cart.reduce((result, item) => (result = result && item.selected), true)
         ? state.cart.map((item) => {
             item.selected = false;
@@ -70,8 +70,8 @@ export const {
   changeQuantityRequest,
   changeQuantitySuccess,
   changeQuantityFailure,
-  selectEachItem,
-  selectAllItem,
+  selectCartItem,
+  selectAllCartItem,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -7,84 +7,72 @@ import {
   getCartItemRequest,
   deleteCartItemRequest,
   changeQuantityRequest,
-  selectEachItem,
-  selectAllItem,
+  selectCartItem,
+  selectAllCartItem,
 } from "@features/cart/cartSlice";
 import { RootState } from "@app/rootReducer";
+import Checkbox from "@components/Checkbox";
 
 const Cart = () => {
   const dispatch = useDispatch();
   const { userId: user_id } = useParams<{ userId: string }>();
   const { cart } = useSelector((state: RootState) => state.cartSlice);
 
-  const selectedAll = cart.reduce((result, item) => (result = result && item.selected), true);
+  const selectedAll = cart.every((item) => item.selected);
   const selectedItems = cart.filter((item) => item.selected);
-  const totalPrice = selectedItems
-    ?.reduce((acc, cur) => {
-      return acc + cur.price * cur.quantity;
-    }, 0)
-    .toLocaleString();
+  const totalPrice = selectedItems.reduce((acc, cur) => {
+    return acc + cur.price * cur.quantity;
+  }, 0);
 
   useEffect(() => {
     dispatch(getCartItemRequest({ user_id }));
   }, [dispatch, , user_id]);
 
-  const onSelectEachItem = useCallback(
+  const handleCheckItem = useCallback(
     (e) => {
-      dispatch(selectEachItem(e));
+      dispatch(selectCartItem(e));
     },
     [dispatch],
   );
 
-  const onSelectAllItems = useCallback(() => {
-    dispatch(selectAllItem());
+  const handleCheckAllItem = useCallback(() => {
+    dispatch(selectAllCartItem());
   }, [dispatch]);
-
-  // console.log(cart);
-
-  const deleteOneItem = useCallback(
-    (id: number) => {
-      const findProductId = cart.filter((item) => item.id == id);
-      const idArr = [];
-      idArr.push({ product_id: findProductId?.[0].products.id });
-      dispatch(deleteCartItemRequest({ product_id: idArr, user_id }));
-    },
-    [cart, dispatch, user_id],
-  );
-
-  const deleteSelected = useCallback(() => {
-    const itemsToDelete = cart.filter((item) => item.selected);
-    const idsToDelete = itemsToDelete.map((item) => item.products.id);
-    const productIdArr = [];
-    if (idsToDelete) {
-      for (let id of idsToDelete) {
-        productIdArr.push({ product_id: id });
-      }
-    }
-    dispatch(deleteCartItemRequest({ product_id: productIdArr, user_id }));
-  }, [cart, dispatch, user_id]);
 
   const handleQuantity = (e: { target: { value: number } }, id: number) => {
     const { value } = e.target;
     dispatch(changeQuantityRequest({ user_id, quantity: Number(value), cart_id: id }));
   };
-  console.log(cart);
+
+  const handleDeleteItem = useCallback(
+    (id: number) => {
+      const findProductId = cart.filter((item) => item.id === id);
+      const productIdArr = [];
+      productIdArr.push({ product_id: findProductId?.[0].products.id });
+      dispatch(deleteCartItemRequest({ product_id: productIdArr, user_id }));
+    },
+    [cart, dispatch, user_id],
+  );
+
+  const handleDeleteSelectedItem = useCallback(() => {
+    const idsToDelete = selectedItems.map((item) => item.products.id);
+    const productIdArr = [];
+    for (let id of idsToDelete) {
+      productIdArr.push({ product_id: id });
+    }
+    dispatch(deleteCartItemRequest({ product_id: productIdArr, user_id }));
+  }, [dispatch, selectedItems, user_id]);
+
   return (
     <S.WholeContainer>
       <S.CartWrapper>
         <S.CartUpperSection>
           <S.TotalItem>
-            <S.SelectedItem>
-              <input type="checkbox" id="checkAllProducts" checked={selectedAll} onChange={onSelectAllItems} />
-              <label htmlFor="checkAllProducts">
-                <span></span>
-                전체
-              </label>
-              <span>{cart?.length}</span>
-            </S.SelectedItem>
+            <Checkbox id="All" checked={selectedAll} onChange={handleCheckAllItem} labelText={`전체`} />
+            {/* <span>{cart.length}</span> */}
             <S.RemoveItems>
               {selectedItems.length}개 선택
-              <button onClick={deleteSelected}>
+              <button onClick={handleDeleteSelectedItem}>
                 <img alt="removeBtn" />
               </button>
             </S.RemoveItems>
@@ -99,9 +87,9 @@ const Cart = () => {
                   key={index}
                   index={index}
                   item={item}
-                  selectItem={onSelectEachItem}
+                  selectItem={handleCheckItem}
                   handleQuantity={handleQuantity}
-                  deleteOneItem={deleteOneItem}
+                  handleDeleteItem={handleDeleteItem}
                 />
               );
             })}
@@ -129,7 +117,7 @@ const Cart = () => {
         </S.CartLowerSection>
       </S.CartWrapper>
       <S.GoToPay>
-        <span>{totalPrice}원 주문 하기</span>
+        <span>{totalPrice.toLocaleString()}원 주문 하기</span>
       </S.GoToPay>
     </S.WholeContainer>
   );
