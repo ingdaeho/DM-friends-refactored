@@ -14,20 +14,21 @@ export interface ICart {
   selected: boolean;
 }
 
-export interface ICartRequest {
-  user_id: number;
-  product_id?: number | number[];
-  cart_id?: number;
-  quantity?: number;
-}
-
 export interface ICartState {
   cart: ICart[];
   isLoading: boolean;
   error: Error | null;
 }
 
-export interface IDeleteRequest {
+export interface ICartRequest {
   user_id: number;
+}
+
+export interface IDeleteRequest extends ICartRequest {
   product_id: object[];
+}
+
+export interface IChangeQuantityRequest extends ICartRequest {
+  cart_id: number;
+  quantity: number;
 }

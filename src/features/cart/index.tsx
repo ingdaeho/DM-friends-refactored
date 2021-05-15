@@ -66,17 +66,9 @@ const Cart = () => {
 
   const handleQuantity = (e: { target: { value: number } }, id: number) => {
     const { value } = e.target;
-    if (cart) {
-      for (let item of cart) {
-        if (item.id === id) {
-          item.quantity = value;
-        }
-      }
-    }
-    dispatch(changeQuantityRequest({ cart, user_id, quantity: value, cart_id: id }));
-    // dispatch({ type: changeQuantityRequest, data: { cartItems, user_id, quantity: value, cart_id: id } });
+    dispatch(changeQuantityRequest({ user_id, quantity: Number(value), cart_id: id }));
   };
-
+  console.log(cart);
   return (
     <S.WholeContainer>
       <S.CartWrapper>

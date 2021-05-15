@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
-import { ICart, ICartRequest, ICartState, IDeleteRequest } from "./types";
+import { ICart, ICartRequest, ICartState, IChangeQuantityRequest, IDeleteRequest } from "./types";
 
 export const initialState: ICartState = {
   cart: [],
@@ -32,6 +32,15 @@ const cartSlice = createSlice({
       state.isLoading = false;
       state.cart = action.payload;
     },
+    deleteCartItemSuccess(state: ICartState, action: PayloadAction<number[]>) {
+      state.cart = state.cart.filter((item) => !action.payload.includes(item.products.id));
+      state.isLoading = false;
+    },
+    changeQuantitySuccess(state: ICartState, action: PayloadAction<{ [key: string]: number }>) {
+      state.isLoading = false;
+      const target = state.cart.find((item) => item.id === action.payload.cart_id);
+      if (target) target.quantity = action.payload.quantity;
+    },
     selectEachItem(state: ICartState, action: PayloadAction<number>) {
       state.cart = state.cart.map((item) =>
         item.id === action.payload ? { ...item, selected: !item.selected } : item,
@@ -47,17 +56,6 @@ const cartSlice = createSlice({
             item.selected = true;
             return item;
           });
-    },
-    deleteCartItemSuccess(state: ICartState, action: PayloadAction<number[]>) {
-      state.cart = state.cart.filter((item) => !action.payload.includes(item.products.id));
-      state.isLoading = false;
-    },
-    deleteSelectedItemsSuccess(state: ICartState) {
-      state.isLoading = false;
-    },
-    changeQuantitySuccess(state: ICartState, action) {
-      state.isLoading = false;
-      // state.cartData = action.payload;
     },
   },
 });
@@ -116,15 +114,16 @@ function* deleteCartItemSaga(action: PayloadAction<IDeleteRequest>) {
   }
 }
 
-function changeQuantityAPI(payload: ICartRequest) {
+function changeQuantityAPI(payload: IChangeQuantityRequest) {
   const { user_id, cart_id, quantity } = payload;
   return axios.put(`/users/${user_id}/cart`, { cart_id, quantity: Number(quantity) });
 }
 
-function* changeQuantitySaga(action: PayloadAction<ICartRequest>) {
+function* changeQuantitySaga(action: PayloadAction<IChangeQuantityRequest>) {
+  const { quantity, cart_id } = action.payload;
   try {
     yield call(changeQuantityAPI, action.payload);
-    yield put(changeQuantitySuccess(action.payload.quantity));
+    yield put(changeQuantitySuccess({ quantity, cart_id }));
   } catch (err) {
     console.error(err);
     yield put(changeQuantityFailure(err));
