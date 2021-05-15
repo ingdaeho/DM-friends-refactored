@@ -14,12 +14,6 @@ export interface ICart {
   selected: boolean;
 }
 
-export interface ICheckbox {
-  cartData: ICart[];
-  selectedAll?: boolean;
-  id?: number;
-}
-
 export interface ICartRequest {
   user_id: number;
   product_id?: number | number[];
@@ -28,8 +22,12 @@ export interface ICartRequest {
 }
 
 export interface ICartState {
-  cart: [];
+  cart: ICart[];
   isLoading: boolean;
   error: Error | null;
-  selectAll: boolean;
+}
+
+export interface IDeleteRequest {
+  user_id: number;
+  product_id: object[];
 }

@@ -1,13 +1,12 @@
 import axios, { AxiosResponse } from "axios";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { call, put, takeEvery, takeLatest } from "redux-saga/effects";
-import { ICart, ICartRequest, ICartState, ICheckbox } from "./types";
+import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { ICart, ICartRequest, ICartState, IDeleteRequest } from "./types";
 
 export const initialState: ICartState = {
-  cart: [] || null,
+  cart: [],
   isLoading: false,
   error: null,
-  selectAll: true,
 };
 
 const startLoading = (state: ICartState, action: PayloadAction<any>) => {
@@ -27,33 +26,38 @@ const cartSlice = createSlice({
     getCartItemFailure: loadingFailed,
     deleteCartItemRequest: startLoading,
     deleteCartItemFailure: loadingFailed,
-    deleteSelectedItemsRequest: startLoading,
-    deleteSelectedItemsFailure: loadingFailed,
     changeQuantityRequest: startLoading,
     changeQuantityFailure: loadingFailed,
-    getCartItemSuccess(state: ICartState, action) {
+    getCartItemSuccess(state: ICartState, action: PayloadAction<ICart[]>) {
       state.isLoading = false;
       state.cart = action.payload;
     },
-    deleteCartItemSuccess(state: ICartState, action) {
-      state.isLoading = false;
-      // state.cartData = state.cartData?.filter((item) => item.id !== action.payload.cart_id);
+    selectEachItem(state: ICartState, action: PayloadAction<number>) {
+      state.cart = state.cart.map((item) =>
+        item.id === action.payload ? { ...item, selected: !item.selected } : item,
+      );
     },
-    deleteSelectedItemsSuccess(state: ICartState, action) {
+    selectAllItem(state: ICartState) {
+      state.cart = state.cart.reduce((result, item) => (result = result && item.selected), true)
+        ? state.cart.map((item) => {
+            item.selected = false;
+            return item;
+          })
+        : state.cart.map((item) => {
+            item.selected = true;
+            return item;
+          });
+    },
+    deleteCartItemSuccess(state: ICartState, action: PayloadAction<number[]>) {
+      state.cart = state.cart.filter((item) => !action.payload.includes(item.products.id));
+      state.isLoading = false;
+    },
+    deleteSelectedItemsSuccess(state: ICartState) {
       state.isLoading = false;
     },
     changeQuantitySuccess(state: ICartState, action) {
       state.isLoading = false;
       // state.cartData = action.payload;
-    },
-    selectAllRequest(state: ICartState, action) {
-      state.selectAll = state.cart?.reduce((result: boolean, item: ICart) => (result = result && item.selected), true);
-    },
-    selectAllSuccess(state: ICartState, action) {
-      state.selectAll = action.payload;
-    },
-    selectEach(state: ICartState, action) {
-      state.cart = state.cart;
     },
   },
 });
@@ -65,15 +69,11 @@ export const {
   deleteCartItemRequest,
   deleteCartItemSuccess,
   deleteCartItemFailure,
-  deleteSelectedItemsRequest,
-  deleteSelectedItemsSuccess,
-  deleteSelectedItemsFailure,
   changeQuantityRequest,
   changeQuantitySuccess,
   changeQuantityFailure,
-  selectAllRequest,
-  selectAllSuccess,
-  selectEach,
+  selectEachItem,
+  selectAllItem,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
@@ -99,28 +99,20 @@ function* getCartItemSaga(action: PayloadAction<ICartRequest>) {
   }
 }
 
-function deleteCartItemAPI(payload: ICartRequest) {
+function deleteCartItemAPI(payload: IDeleteRequest) {
   const { user_id, product_id } = payload;
   return axios.delete(`/users/${user_id}/cart`, { data: product_id });
 }
 
-function* deleteCartItem(action: PayloadAction<ICartRequest>) {
+function* deleteCartItemSaga(action: PayloadAction<IDeleteRequest>) {
+  const { product_id } = action.payload;
   try {
     yield call(deleteCartItemAPI, action.payload);
-    yield put(deleteCartItemSuccess(action.payload));
+    const idArr: number[] = product_id.map((product_id) => Object.values(product_id)).flat();
+    yield put(deleteCartItemSuccess(idArr));
   } catch (err) {
     console.error(err);
     yield put(deleteCartItemFailure(err));
-  }
-}
-
-function* deleteSelectedItems(action: PayloadAction<ICartRequest>) {
-  try {
-    yield call(deleteCartItemAPI, action.payload);
-    yield put(deleteSelectedItemsSuccess(action.payload));
-  } catch (err) {
-    console.error(err);
-    yield put(deleteSelectedItemsFailure(err));
   }
 }
 
@@ -129,7 +121,7 @@ function changeQuantityAPI(payload: ICartRequest) {
   return axios.put(`/users/${user_id}/cart`, { cart_id, quantity: Number(quantity) });
 }
 
-function* changeQuantity(action: PayloadAction<ICartRequest>) {
+function* changeQuantitySaga(action: PayloadAction<ICartRequest>) {
   try {
     yield call(changeQuantityAPI, action.payload);
     yield put(changeQuantitySuccess(action.payload.quantity));
@@ -139,59 +131,8 @@ function* changeQuantity(action: PayloadAction<ICartRequest>) {
   }
 }
 
-// function* select(action: PayloadAction<Checkbox>) {
-//   const { selectedAll, cartData } = action.payload;
-//   try {
-//     const a = selectedAll
-//       ? cartData?.map((item) => (item.selected = false))
-//       : cartData?.map((item) => (item.selected = true));
-//     yield put(selectAllRequest(a));
-//   } catch (err) {
-//     console.error(err);
-//   }
-// }
-
-function filter(payload: ICheckbox) {
-  const { cartData, id } = payload;
-  for (let item of cartData) {
-    if (item.id === id) {
-      item.selected = !item.selected;
-    }
-  }
-}
-
-function* selectEachfuction(action: PayloadAction<ICheckbox>) {
-  const { id, cartData } = action.payload;
-  try {
-    console.log(action.payload);
-    yield call(filter, action.payload);
-    // yield put(selectEach(action.payload));
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function* watchselectEach() {
-  yield takeEvery(selectEach, selectEachfuction);
-}
-
-// function* watchSelectAll() {
-//   yield takeEvery(selectAllRequest, select);
-// }
-
-// function* watchGetCartItem() {
-//   yield takeLatest(getCartItemRequest, getCartItem);
-// }
-
-function* watchChangeQuantity() {
-  yield takeLatest(changeQuantityRequest, changeQuantity);
-}
-
-function* watchDeleteCartItem() {
-  yield takeLatest(deleteCartItemRequest, deleteCartItem);
-  yield takeLatest(deleteSelectedItemsRequest, deleteSelectedItems);
-}
-
 export function* cartSaga() {
   yield takeLatest(getCartItemRequest, getCartItemSaga);
+  yield takeLatest(changeQuantityRequest, changeQuantitySaga);
+  yield takeLatest(deleteCartItemRequest, deleteCartItemSaga);
 }
