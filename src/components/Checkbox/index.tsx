@@ -4,8 +4,8 @@ import * as S from "./styles";
 interface CheckboxProps {
   id: string | number;
   labelText?: string;
-  checked: boolean;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  checked?: boolean;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Checkbox: FC<CheckboxProps> = (props) => {

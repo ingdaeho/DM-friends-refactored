@@ -5,6 +5,7 @@ import useInput from "@hooks/useInput";
 import * as S from "./styles";
 import { loginRequest } from "@features/users/userSlice";
 import { RootState } from "@app/rootReducer";
+import Checkbox from "@components/Checkbox";
 
 const LogIn = () => {
   const dispatch = useDispatch();
@@ -55,13 +56,7 @@ const LogIn = () => {
           <S.Form onSubmit={onSubmit}>
             <S.Input id="email" type="email" placeholder="이메일주소" onChange={onChangeEmail} />
             <S.Input id="pw" type="password" placeholder="비밀번호" onChange={onChangePassword} />
-            <S.CheckBox>
-              <input type="checkbox" id="loginCheckbox" />
-              <label htmlFor="loginCheckbox">
-                <span></span>
-                로그인 상태 유지
-              </label>
-            </S.CheckBox>
+            <Checkbox id="login" labelText={`로그인 상태 유지`} />
             <S.LoginButton style={{ backgroundColor: "#fbdd0d" }}>로그인</S.LoginButton>
             <S.Line>
               <div></div>

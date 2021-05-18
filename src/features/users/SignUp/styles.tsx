@@ -86,35 +86,6 @@ export const TermContainer = styled.ul`
     justify-content: flex-start;
     align-items: center;
     margin: 15px 0px;
-
-    input[type="checkbox"] {
-      display: none;
-    }
-
-    input[type="checkbox"] + label {
-      color: rgba(0, 0, 0, 0.8);
-      font-size: 15px;
-    }
-
-    input[type="checkbox"] + label span {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      border-radius: 100%;
-      vertical-align: middle;
-      margin: -2px 10px 0 0;
-      background: white;
-      cursor: pointer;
-    }
-
-    input[type="checkbox"]:checked + label span {
-      width: 16px;
-      height: 16px;
-      border-radius: 100%;
-      background: white;
-      border: 5px solid #fbdd0d;
-    }
   }
 `;
 

@@ -7,6 +7,7 @@ import Terms from "@features/users/SignUp/Term";
 import useInput from "@hooks/useInput";
 import { RootState } from "@app/rootReducer";
 import { ITerms } from "@features/users/types";
+import Checkbox from "@components/Checkbox";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -145,11 +146,7 @@ const SignUp = () => {
         <S.TermTitle>약관 동의</S.TermTitle>
         <S.TermContainer>
           <li>
-            <input type="checkbox" id="checkAllBoxes" checked={checkedAll} onChange={handleAllCheckedBoxes} />
-            <label htmlFor="checkAllBoxes">
-              <span></span>
-              전체동의
-            </label>
+            <Checkbox id="all" checked={checkedAll} onChange={handleAllCheckedBoxes} labelText="전체동의" />
           </li>
           <div className="formPolicyBar"></div>
           {terms.map((terms, index) => {

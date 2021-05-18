@@ -83,53 +83,6 @@ export const Input = styled.input`
   }
 `;
 
-export const CheckBox = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 40px;
-
-  input {
-    width: 100%;
-    height: 40px;
-    border: none;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-
-  input[type="checkbox"] {
-    display: none;
-  }
-
-  input[type="checkbox"] + label {
-    color: rgba(0, 0, 0, 0.8);
-    font-size: 14px;
-  }
-
-  input[type="checkbox"] + label span {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 100%;
-    vertical-align: middle;
-    margin: -2px 10px 0 0;
-    background: white;
-    cursor: pointer;
-  }
-
-  input[type="checkbox"]:checked + label span {
-    width: 16px;
-    height: 6px;
-    border-radius: 100%;
-    background: white;
-    border: 6px solid #fbdd0d;
-  }
-`;
-
 export const LoginButton = styled.button`
   width: 100%;
   height: 48px;

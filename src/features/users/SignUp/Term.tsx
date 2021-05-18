@@ -1,4 +1,5 @@
-import { FC } from "react";
+import { FC, memo } from "react";
+import Checkbox from "@components/Checkbox";
 
 interface Props {
   index: number;
@@ -10,13 +11,14 @@ interface Props {
 const Term: FC<Props> = ({ index, title, checkedTerms, handleCheckedBox }) => {
   return (
     <li>
-      <input type="checkbox" checked={checkedTerms} id={`title${index}`} onChange={() => handleCheckedBox(index)} />
-      <label htmlFor={`title${index}`}>
-        <span></span>
-        {title}
-      </label>
+      <Checkbox
+        id={`term ${index}`}
+        checked={checkedTerms}
+        onChange={() => handleCheckedBox(index)}
+        labelText={title}
+      />
     </li>
   );
 };
 
-export default Term;
+export default memo(Term);
