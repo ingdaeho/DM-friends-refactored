@@ -1,45 +1,34 @@
 import axios, { AxiosResponse } from "axios";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { call, put, select, takeEvery, takeLatest } from "redux-saga/effects";
-import { IFeeds, IFeedState } from "./types";
+import { IFeeds, IFeedState, IQuery } from "./types";
 import { RootState } from "@app/rootReducer";
 
 export const initialState: IFeedState = {
-  feeds: [] || null,
+  feeds: [],
   isLoading: false,
   error: null,
-  query: {
-    limit: 5,
-    offset: 0,
-  },
-};
-
-const startLoading = (state: IFeedState) => {
-  state.isLoading = true;
-};
-
-const loadingFailed = (state: IFeedState, action: PayloadAction<Error>) => {
-  state.isLoading = false;
-  state.error = action.payload;
 };
 
 const feedSlice = createSlice({
   name: "feed",
   initialState,
   reducers: {
-    getFeedsStart: startLoading,
-    getFeedsFailure: loadingFailed,
+    getFeedsStart(state: IFeedState, action: PayloadAction<IQuery>) {
+      state.isLoading = true;
+    },
+    getFeedsFailure(state: IFeedState, action: PayloadAction<Error>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
     getFeedsSuccess(state, action) {
       state.feeds = state.feeds.concat(action.payload);
       state.isLoading = false;
     },
-    addPage(state: IFeedState) {
-      state.query.offset = state.query.limit + state.query.offset;
-    },
   },
 });
 
-export const { getFeedsStart, getFeedsSuccess, getFeedsFailure, addPage } = feedSlice.actions;
+export const { getFeedsStart, getFeedsSuccess, getFeedsFailure } = feedSlice.actions;
 
 export default feedSlice.reducer;
 
@@ -54,9 +43,9 @@ function getFeedAPI(query: { limit: number; offset: number }) {
   return axios.get(`feeds?limit=${limit}&offset=${offset}`);
 }
 
-function* getFeedSaga() {
+function* getFeedSaga(action: PayloadAction<IQuery>) {
   try {
-    const { query } = yield select((state: RootState) => state.feedSlice);
+    const query = action.payload;
     const feeds: AxiosResponse<IFeeds> = yield call(getFeedAPI, query);
     yield put(getFeedsSuccess(feeds.data));
   } catch (err) {

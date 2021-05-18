@@ -23,8 +23,9 @@ export interface IFeedState {
   feeds: IFeeds[];
   isLoading: boolean;
   error: Error | null;
-  query: {
-    limit: number;
-    offset: number;
-  };
+}
+
+export interface IQuery {
+  limit: number;
+  offset: number;
 }

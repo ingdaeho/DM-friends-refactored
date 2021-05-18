@@ -1,24 +1,31 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutRequest } from "@features/users/userSlice";
 import { useHistory } from "react-router";
 import * as S from "./styles";
-import { IFeeds } from "./types";
+import { IFeeds, IQuery } from "./types";
 import { RootState } from "@app/rootReducer";
-import { addPage, getFeedsStart } from "./feedSlice";
+import { getFeedsStart } from "./feedSlice";
 import useIntersectionObserver from "@hooks/useIntersection";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const history = useHistory();
   const { feeds, isLoading, error } = useSelector((state: RootState) => state.feedSlice);
+  const [query, setQuery] = useState<IQuery>({
+    limit: 5,
+    offset: 0,
+  });
   const isLoggedIn = sessionStorage.getItem("token");
 
-  console.log(feeds);
+  const addPage = useCallback((query: IQuery) => {
+    const { limit, offset } = query;
+    setQuery({ offset: limit + offset, limit: 5 });
+  }, []);
 
   useEffect(() => {
-    dispatch(getFeedsStart());
-  }, [dispatch]);
+    dispatch(getFeedsStart(query));
+  }, [dispatch, query]);
 
   const ref = useRef<HTMLDivElement | null>(null);
   const entry = useIntersectionObserver(ref, {});
@@ -26,10 +33,10 @@ const Feed = () => {
 
   useEffect(() => {
     if (isVisible) {
-      dispatch(addPage());
-      dispatch(getFeedsStart());
+      addPage(query);
+      dispatch(getFeedsStart(query));
     }
-  }, [dispatch, isVisible]);
+  }, [addPage, dispatch, isVisible, query]);
 
   const LogInOrOut = useCallback(() => {
     if (isLoggedIn) {

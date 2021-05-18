@@ -17,6 +17,7 @@ const startLoading = (state: IUserState, action: PayloadAction<any>) => {
 const loadingFailed = (state: IUserState, action: PayloadAction<Error>) => {
   state.isLoading = false;
   state.error = action.payload;
+  state.loginDone = false;
 };
 
 const userSlice = createSlice({
