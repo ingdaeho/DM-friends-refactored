@@ -6,6 +6,7 @@ import * as S from "./styles";
 import { loginRequest } from "@features/users/userSlice";
 import { RootState } from "@app/rootReducer";
 import Checkbox from "@components/Checkbox";
+import Button from "@components/Button";
 
 const LogIn = () => {
   const dispatch = useDispatch();
@@ -57,13 +58,13 @@ const LogIn = () => {
             <S.Input id="email" type="email" placeholder="이메일주소" onChange={onChangeEmail} />
             <S.Input id="pw" type="password" placeholder="비밀번호" onChange={onChangePassword} />
             <Checkbox id="login" labelText={`로그인 상태 유지`} />
-            <S.LoginButton style={{ backgroundColor: "#fbdd0d" }}>로그인</S.LoginButton>
+            <Button text="회원가입" bgColor="#fbdd0d" />
             <S.Line>
               <div></div>
               <div>또는</div>
               <div></div>
             </S.Line>
-            <S.LoginButton disabled>QR코드 로그인</S.LoginButton>
+            <Button text="QR코드 로그인" disabled textColor="black" />
           </S.Form>
           <S.SignIn>
             <Link to="Signup">회원가입</Link>

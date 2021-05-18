@@ -89,18 +89,6 @@ export const TermContainer = styled.ul`
   }
 `;
 
-export const Button = styled.button`
-  width: 100%;
-  height: 45px;
-  margin-top: 40px;
-  border: white;
-  border-radius: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  color: black;
-  background-color: ${(props) => (props.disabled ? "" : "#fbdd0d")};
-`;
-
 export const Footer = styled.footer`
   display: flex;
   flex-direction: column;

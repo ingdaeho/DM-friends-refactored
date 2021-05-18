@@ -8,6 +8,7 @@ import useInput from "@hooks/useInput";
 import { RootState } from "@app/rootReducer";
 import { ITerms } from "@features/users/types";
 import Checkbox from "@components/Checkbox";
+import Button from "@components/Button";
 
 const SignUp = () => {
   const dispatch = useDispatch();
@@ -161,7 +162,7 @@ const SignUp = () => {
             );
           })}
         </S.TermContainer>
-        <S.Button disabled={!formComplete}>회원가입</S.Button>
+        <Button text="회원가입" disabled={!formComplete} />
       </S.Form>
       <S.Footer>
         <span>
